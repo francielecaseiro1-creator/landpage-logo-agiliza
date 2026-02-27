@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leads: Public can write (create), only authenticated admins can read/update
+    match /leads/{lead} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    
+    // Settings: Only authenticated admins can read/write
+    // (Or public read if you want to apply pixels dynamically, but better to keep restricted if possible. 
+    // Actually, for the LP to load the pixels, it needs to read this document publicly)
+    match /settings/global {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}
